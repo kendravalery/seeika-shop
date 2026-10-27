@@ -37,20 +37,22 @@ class CustomerLoginController extends Controller
     {
         return view('auth.login');
     }
-    // Peroses login//
+    // Peroses login
     public function login(Request $request)
     {
         if (Auth::attempt($request->only('email', 'password'))) {
             $request->session()->regenerate();
 
             if (Auth::user()->role->name === 'admin') {
-                // ini bagian pencegahaan supaya admin gak masuk ke customer
+                // This is a preventive measure to stop admins from accessing customer accounts.
                 Auth::logout();
-                return back()->withErrors(['email' => 'Gunakan login admin']);
+                return back();
             }
             return redirect('/');
         }
-        return back()->withErrors(['email' => 'Password atau Email salah']);
+        return back()->withErrors([
+            'email' => 'Incorrect password or email',
+        ]);
     }
 
     public function logout(Request $request)

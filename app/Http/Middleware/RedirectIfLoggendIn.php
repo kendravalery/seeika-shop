@@ -20,7 +20,7 @@ class RedirectIfLoggendIn
             $role = Auth::user()->role->name;
 
             if ($role === 'admin') {
-                return redirect()->route('admim.dashboard');
+                return redirect()->route('admin.dashboard');
             }
 
             if ($role === 'customer') {

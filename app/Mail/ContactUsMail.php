@@ -18,6 +18,6 @@ class ContactUsMail extends Mailable
     }
     public function build()
     {
-        return $this->subject('Pesan Baru Contact Us - Zedli Store')->view('emails.contact.contact');
+        return $this->subject('Pesan Baru Contact Us - Seeika Shop')->view('emails.contact.contact');
     }
 }

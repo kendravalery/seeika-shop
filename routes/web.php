@@ -1,29 +1,57 @@
 <?php
 
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Shop\HomeController;
+use App\Http\Controllers\Admin\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\CustomerLoginController;
 use App\Http\Controllers\Auth\AdminLoginController;
-use App\Http\Controllers\BannerController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\PageController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\ProductController as AdminProductController;
-use App\Http\Controllers\SearchController;
+use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Commerce\CartController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Commerce\CheckoutController;
+use App\Http\Controllers\Admin\CollectionController;
+use App\Http\Controllers\Shop\CustomerCollectionController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\ReviewController;
+use App\Http\Controllers\Customer\CustomerController;
+use App\Http\Controllers\Shop\PageController;
+use App\Http\Controllers\Commerce\PaymentController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Shop\SearchController;
 use App\Http\Controllers\Shop\ProductController as ShopProductController;
-use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\Customer\WishlistController;
+use Illuminate\Http\Request;
+
+Route::post('/timezone', function (Request $request) {
+    $request->validate([
+        'timezone' => ['required', 'timezone'],
+    ]);
+
+    session([
+        'timezone' => $request->timezone,
+    ]);
+
+    if (auth()->check()) {
+        auth()->user()->update([
+                'timezone' => $request->timezone,
+            ]);
+    }
+    return response()->json(['success' => true]);
+})->name('timezone.update');
 
 // SEARCH
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
 // SHOW PRODUCT
-Route::get('/products/{id}', [ShopProductController::class, 'show'])->name('products.show');
+Route::get('/products/{slug}', [ShopProductController::class, 'show'])->name('products.show');
+
+Route::get('/collections/new-items', [CustomerCollectionController::class, 'newItems'])->name('storefront.collections.new-items');
+
+Route::get('/collections/{slug}', [CustomerCollectionController::class, 'show'])->name('storefront.collections.show');
+
+Route::get('/collections', [CustomerCollectionController::class, 'index'])->name('storefront.collections');
 
 //  MIDDLEWARE REDIRECT LOGINS
 Route::middleware('redirect')->group(function () {
@@ -36,13 +64,13 @@ Route::middleware('redirect')->group(function () {
     Route::get('/admin/login', [AdminLoginController::class, 'loginForm'])->name('admin.login');
     Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.post');
 });
-// ROLE CUSTOMER 
+// ROLE CUSTOMER
 Route::middleware(['auth', 'role:customer'])->group(function () {
-    Route::get('/customer/profil', [CustomerController::class, 'showProfile'])->name('customer.profile');
+    Route::get('/my-account', [CustomerController::class, 'showAccount'])->name('customer.myAccount');
 
-    Route::put('/customer/address/update', [CustomerController::class, 'updateAddress'])->name('customer.address.update');
+    Route::put('/address/update', [CustomerController::class, 'updateAddress'])->name('customer.address.update');
 
-    Route::put('/customer/profile/photo', [CustomerController::class, 'updatePhoto'])->name('customer.profile.update');
+    Route::put('/profile/photo', [CustomerController::class, 'updatePhoto'])->name('customer.profile.update');
 
     Route::get('/manage-account', [CustomerController::class, 'manageAccount'])->name('customer.manage.account');
 
@@ -55,7 +83,7 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
 
     Route::delete('/manage-account/delete/{id}', [CustomerController::class, 'deleteAddress'])->name('customer.Address.delete');
     Route::put('/manage-account/update/{id}', [CustomerController::class, 'updateManageAddress'])->name('customer.Address.update');
-    Route::get('/customer/address', [CustomerController::class, 'showAddress'])->name('customer.address');
+    Route::get('/address', [CustomerController::class, 'showAddress'])->name('customer.address');
 
     // province - city -
     Route::get('/get-cities/{provinceCode}', [CustomerController::class, 'getCities']);
@@ -74,11 +102,15 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::patch('/cart/select-all', [CartController::class, 'selectAll'])->name('cart.selectAll');
 
     // checkout
-    Route::post('checkout', [CheckoutController::class, 'checkout'])->name('checkout');
-    Route::get('checkout', [CheckoutController::class, 'checkout'])->name('checkout.back');
+    Route::Get('checkout', [CheckoutController::class, 'checkout'])->name('checkout');
+
+    // Save checkout details before proceeding
+    Route::post('/checkout/continue', [PaymentController::class, 'continueToPayment'])->name('checkout.continue');
+
     // payment
-    Route::post('/payment', [PaymentController::class, 'index'])->name('payment.index');
-    // Tombol Pay (nanti dibuat)
+    Route::get('/payment', [PaymentController::class, 'index'])->name('payment.index');
+
+    //  payment processing (add when implemented)
     // Route::post('/payment', [PaymentController::class, 'pay'])->name('payment.pay');
 
     // WISHLIST
@@ -91,34 +123,38 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/faq', [PageController::class, 'faq'])->name('faq');
 
-// ROLE ADMIN
+// ADMIN ROLE
 Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->as('admin.')
     ->group(function () {
         Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
-        Route::resource('products', AdminProductController::class);
+        Route::resource('products', ProductController::class);
 
-        Route::delete('product/image/{id}', [AdminProductController::class, 'deleteImage'])->name('products.image.delete');
+        Route::delete('product/image/{id}', [ProductController::class, 'deleteImage'])->name('products.image.delete');
 
         // CATEGORIES
         Route::resource('categories', CategoryController::class);
 
-        // ORDERS (biasanya cuma lihat)
+        // COLLECTIONS
+        Route::resource('collections', CollectionController::class);
+
+        // ORDERS (Just looking)
         Route::resource('orders', OrderController::class)->only(['index', 'show']);
 
         //  REVIEWS (moderasi)
         Route::resource('reviews', ReviewController::class)->only(['index', 'update', 'destroy']);
 
         Route::resource('banners', BannerController::class);
-
-        Route::patch('baners/{id}/toggle/', [BannerController::class, 'toggle'])->name('banners.toggle');
+        Route::patch('banners/{id}/toggle/', [BannerController::class, 'toggle'])->name('banners.toggle');
     });
+
 // 404
 Route::fallback(function () {
     return view('error');
 });
 
 Route::post('logout', [CustomerLoginController::class, 'logout'])->name('logout');
-Route::post('logout', [CustomerLoginController::class, 'logout'])->name('logout');
+
+// clean code makesure ,commit

@@ -15,4 +15,9 @@ class ProductImage extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function optionValues(){
+        return $this->hasMany(ProductOptionValue::class, 'image_id');
+    }
+
 }

@@ -10,9 +10,13 @@
 </head>
 
 <body>
-    <div class="flex min-h-screen items-center justify-center ">
-        <h1 class="text-red-800">Halaman Tidak Di temukan :( </h1>
-        <p> <a href="/" class="py-1 hover:underline">Kembali</a></p>
+    <div class="flex flex-col items-center justify-center min-h-screen">
+        <h1 class="text-5xl  text-red-600 font-extrabold">404</h1>
+        <div class="mt-4 text-gray-600 text-lg ">Page Not Found:(</div>
+        <a href="/"
+            class="m-6 px-4 py-2 bg-white text-black hover:bg-slate-100 shadow-md hover:scale-105 transition rounded-lg border border-slate-200">
+            Go to homepage
+        </a>
     </div>
 </body>
 

@@ -17,15 +17,17 @@ class AdminLoginController extends Controller
         if (Auth::attempt($request->only('email', 'password'))) {
             $request->session()->regenerate();
 
-            // hanya admin boleh masuxk
+            // Only admin can log in
             if (Auth::user()->role->name !== 'admin') {
                 Auth::logout();
-                return back()->withErrors(['email' => 'Bukan admin']);
+                return back()->withErrors([
+                    'email' => 'Not admin',
+                ]);
             }
 
             return redirect()->route('admin.dashboard');
         }
 
-        return back()->withErrors(['email' => 'Email / password salah']);
+        return back()->withErrors(['email' => 'Email / password incorrect']);
     }
 }

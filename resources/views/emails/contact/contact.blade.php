@@ -11,7 +11,7 @@
 <body style="font-family: arial,sans-serif; background: #f3f4f6; padding:20px;">
     <div style="max-width: 600px ;margin:auto; background:white; padding:20px;border-radius:10px;">
         <h2 style="color:#333;">
-            Pesan Baru Contact Us - Zedli Store
+            Pesan Baru Contact Us - seeika Shop
         </h2>
         <hr>
         <p><strong>Name :</strong>

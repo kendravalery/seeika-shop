@@ -143,6 +143,39 @@ return [
             // 'users' => [
             //     'filterableAttributes'=> ['id', 'name', 'email'],
             // ],
+
+                \App\Models\Collection::class => [
+                    'filterableAttributes' => [
+                        'type',
+                        'status',
+                    ]
+                ],
+                \App\Models\Product::class => [
+                    'searchableAttributes' => [
+                        'name',
+                        'description',
+                        'category_name',
+                        'parent_category_name',
+                        'sku',
+                    ],
+                    'filterableAttributes' => [
+                        'status',
+                        'availability',
+                        'category_id',
+                        'collection_id',
+                        'product_type',
+                    ],
+                    'sortableAttributes' => [
+                        'name',
+                        'created_at',
+                        'updated_at',
+                        'min_price',
+                        'max_price',
+                        'total_stock',
+                        'sold_count',
+
+                    ],
+                ],
         ],
     ],
 

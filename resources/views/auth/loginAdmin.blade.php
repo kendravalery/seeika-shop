@@ -16,9 +16,8 @@
         </script>
     @endif
     <div class="flex items-center justify-center min-h-screen">
-        <div class="max-w-sm w-full bg-white p-8 rounded-2xl shadow-lg">
-            <p class="text-center">Selamat Datang Admin</p>
-            <h1 class="text-2xl font-bold text-center mb-6 ">Login</h1>
+        <div class="max-w-sm p-8">
+            <p class="text-center mb-8">Welcome Admin</p>
             <form action="{{ route('admin.login.post') }}" class="space-y-2" method="POST">
                 @csrf
                 <input type="email" class="border p-2 w-full" placeholder="Email" name="email">
@@ -26,6 +25,9 @@
                 <button type="submit"
                     class="bg-blue-500 p-2 w-full text-white hover:bg-blue-600 cursor-pointer">Login</button>
             </form>
+            <div class="my-4">
+                <a href="{{ route('home') }}" class="hover:text-blue-600 underline">back to home</a>
+            </div>
         </div>
     </div>
 </body>

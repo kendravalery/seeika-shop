@@ -1,0 +1,33 @@
+/* scrollbar */
+
+/* untuk chrome,edge,safari */
+.sidebar-scroll{
+    overflow-y: auto;
+}
+.sidebar-scroll::-webkit-scrollbar{
+    width: 6px;
+}
+.sidebar-scroll::-webkit-scrollbar-track{
+    background: transparent;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb:hover{
+    background: #94a3b8;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb{
+    background: #cbd5e1;
+    border-radius: 9999px;
+}
+
+.dropdown-content{
+    transition: max-height 0.3s ease-in-out,opacity 0.3s ease-in-out;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+.dropdown-content.open{
+    max-height: 200px;
+    opacity: 1;
+}
+[x-cloak]{
+    display:none !important;
+}

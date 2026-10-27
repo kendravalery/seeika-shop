@@ -12,19 +12,30 @@ return new class extends Migration {
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('collection_id')->nullable()->constrained('collections')->nullOnDelete();
 
             $table->string('name');
             $table->string('slug')->unique();
+
             $table->text('description')->nullable();
-            $table->decimal('price', 15, 2); // harga
-            $table->integer('stock')->default(0);
-            $table->boolean('is_active')->default(true);
-            $table->json('attributes')->nullable(); // {"scale":"1/7","manufacturer":"GoodSmile"}
-            $table->boolean('is_limited')->default(false);
-            $table->integer('limited_quantity')->nullable();
+
+            $table->integer('sold_count')->default(0);
+
+            $table->timestamp('restocked_at')->nullable();
+
+            $table->enum('availability', ['ready', 'preorder'])->default('ready');
+
+            $table->enum('status', ['draft', 'active', 'inactive'])->default('draft');
+
+            // {"scale":"1/7","manufacturer":"****"}
+            $table->json('attributes')->nullable();
+
+            $table->string('preorder_release_label')->nullable();
+
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
